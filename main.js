@@ -30,6 +30,7 @@ class SierpinskiTriangle {
       this.canvasWidth < this.canvasHeight
         ? centerPointOfCanvas
         : middlePointOfCanvas;
+    this.mainCanvas.globalCompositeOperation='destination-over';
     THREE_EVEN_RADIAN_ANGLES.forEach((radianAngle, index) => {
       const x =
         radiusOfMaximumCircleInCanvas * Math.cos(radianAngle) +
@@ -37,6 +38,8 @@ class SierpinskiTriangle {
       const y =
         radiusOfMaximumCircleInCanvas * Math.sin(radianAngle) +
         middlePointOfCanvas;
+      this.mainCanvas.fillStyle = "#fff";
+      this.drawPoint(x, y);
       if (index > 0) {
         // if not the first iteration
         this.rootTriangle.lineTo(x, y);
@@ -46,9 +49,13 @@ class SierpinskiTriangle {
     });
     // draw line back to first point
     this.rootTriangle.closePath();
+    this.mainCanvas.fillStyle = "#000";
     this.mainCanvas.fill(this.rootTriangle);
   }
 
+  drawPoint(x, y) {
+    this.mainCanvas.fillRect(x, y, 1, 1);
+  }
 }
 
 new SierpinskiTriangle();
