@@ -2,9 +2,9 @@
 class SierpinskiTriangle {
   mainCanvas = document.getElementById("sierpinski-triangle").getContext("2d");
   rootTriangle = new Path2D();
+  rootTrianglePoints = [];
 
   get canvasHeight() {
-    console.log(this.mainCanvas);
     return this.mainCanvas.canvas.height;
   }
 
@@ -13,10 +13,12 @@ class SierpinskiTriangle {
   }
 
   constructor() {
-    this.initializeFirstThreeDots();
+    this.initializeRootTriangle();
+    this.mainCanvas.fillStyle = "#fff";
+    this.initializeFirstThreeDots()
   }
 
-  initializeFirstThreeDots() {
+  initializeRootTriangle() {
     // Create an equilateral triangle in the middle of canvas
     // https://stackoverflow.com/a/8937325
     const centerPointOfCanvas = this.canvasWidth / 2;
@@ -30,7 +32,6 @@ class SierpinskiTriangle {
       this.canvasWidth < this.canvasHeight
         ? centerPointOfCanvas
         : middlePointOfCanvas;
-    this.mainCanvas.globalCompositeOperation='destination-over';
     THREE_EVEN_RADIAN_ANGLES.forEach((radianAngle, index) => {
       const x =
         radiusOfMaximumCircleInCanvas * Math.cos(radianAngle) +
@@ -38,8 +39,7 @@ class SierpinskiTriangle {
       const y =
         radiusOfMaximumCircleInCanvas * Math.sin(radianAngle) +
         middlePointOfCanvas;
-      this.mainCanvas.fillStyle = "#fff";
-      this.drawPoint(x, y);
+      this.rootTrianglePoints.push({x, y});
       if (index > 0) {
         // if not the first iteration
         this.rootTriangle.lineTo(x, y);
@@ -49,8 +49,14 @@ class SierpinskiTriangle {
     });
     // draw line back to first point
     this.rootTriangle.closePath();
-    this.mainCanvas.fillStyle = "#000";
     this.mainCanvas.fill(this.rootTriangle);
+  }
+  
+  initializeFirstThreeDots() {
+    this.rootTrianglePoints.forEach((trianglePoint)=>{
+      const {x, y} = trianglePoint;
+      this.drawPoint(x, y)
+    })
   }
 
   drawPoint(x, y) {
