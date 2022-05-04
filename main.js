@@ -1,21 +1,26 @@
 "use strict";
 class SierpinskiTriangle {
-  mainCanvas = document.getElementById("sierpinski-triangle").getContext("2d");
+  mainCanvas = document.getElementById("sierpinski-triangle");
+  mainCanvas2DContext = document
+    .getElementById("sierpinski-triangle")
+    .getContext("2d");
   rootTriangle = new Path2D();
   rootTrianglePoints = [];
-
   get canvasHeight() {
-    return this.mainCanvas.canvas.height;
+    return this.mainCanvas2DContext.canvas.height;
   }
 
   get canvasWidth() {
-    return this.mainCanvas.canvas.width;
+    return this.mainCanvas2DContext.canvas.width;
   }
 
   constructor() {
     this.initializeRootTriangle();
-    this.mainCanvas.fillStyle = "#fff";
-    this.initializeFirstThreeDots()
+    this.mainCanvas2DContext.fillStyle = "#fff";
+    this.initializeFirstThreeDots();
+    this.mainCanvas.addEventListener("click", (event) => {
+      this.addPoint(event);
+    });
   }
 
   initializeRootTriangle() {
@@ -39,7 +44,7 @@ class SierpinskiTriangle {
       const y =
         radiusOfMaximumCircleInCanvas * Math.sin(radianAngle) +
         middlePointOfCanvas;
-      this.rootTrianglePoints.push({x, y});
+      this.rootTrianglePoints.push({ x, y });
       if (index > 0) {
         // if not the first iteration
         this.rootTriangle.lineTo(x, y);
@@ -49,18 +54,28 @@ class SierpinskiTriangle {
     });
     // draw line back to first point
     this.rootTriangle.closePath();
-    this.mainCanvas.fill(this.rootTriangle);
+    this.mainCanvas2DContext.fill(this.rootTriangle);
   }
-  
+
   initializeFirstThreeDots() {
-    this.rootTrianglePoints.forEach((trianglePoint)=>{
-      const {x, y} = trianglePoint;
-      this.drawPoint(x, y)
-    })
+    this.rootTrianglePoints.forEach((trianglePoint) => {
+      const { x, y } = trianglePoint;
+      this.drawPoint(x, y);
+    });
+  }
+
+  addPoint(event) {
+    if (this.checkIsInRootTriangle(event.offsetX, event.offsetY)) {
+      this.drawPoint(event.offsetX, event.offsetY);
+    }
+  }
+
+  checkIsInRootTriangle(x, y) {
+    return this.mainCanvas2DContext.isPointInPath(this.rootTriangle, x, y);
   }
 
   drawPoint(x, y) {
-    this.mainCanvas.fillRect(x, y, 1, 1);
+    this.mainCanvas2DContext.fillRect(x, y, 1, 1);
   }
 }
 
