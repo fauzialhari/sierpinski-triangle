@@ -19,14 +19,14 @@ class SierpinskiTriangle {
   constructor() {
     this.initializeRootTriangle();
     this.mainCanvas2DContext.fillStyle = "#fff";
-    this.initializeFirstThreeDots();
+    this.drawFirstThreeDots();
     this.mainCanvas.addEventListener("click", (event) => {
       try {
         if (!this.lastPoint) {
-          const { x, y } = this.addPoint(event);
+          const { x, y } = this.addDotOnRootTriangle(event);
           this.lastPoint = { x, y };
         }
-        this.generatePoint();
+        this.generateDots();
       } catch (error) {
         alert(error.message);
       }
@@ -67,16 +67,16 @@ class SierpinskiTriangle {
     this.mainCanvas2DContext.fill(this.rootTriangle);
   }
 
-  initializeFirstThreeDots() {
+  drawFirstThreeDots() {
     this.rootTrianglePoints.forEach((trianglePoint) => {
       const { x, y } = trianglePoint;
-      this.drawPoint(x, y);
+      this.drawDot(x, y);
     });
   }
 
-  addPoint(event) {
+  addDotOnRootTriangle(event) {
     if (this.checkIsInRootTriangle(event.offsetX, event.offsetY)) {
-      this.drawPoint(event.offsetX, event.offsetY);
+      this.drawDot(event.offsetX, event.offsetY);
       return { x: event.offsetX, y: event.offsetY };
     }
     throw new Error("The point is outside triangle");
@@ -86,7 +86,7 @@ class SierpinskiTriangle {
     return this.mainCanvas2DContext.isPointInPath(this.rootTriangle, x, y);
   }
 
-  generatePoint() {
+  generateDots() {
     let number = 1;
     do {
       number++;
@@ -95,16 +95,9 @@ class SierpinskiTriangle {
         this.selectOneOfFirstPointsRandomly(),
         { x, y }
       );
-      this.drawPoint(midPoint.x, midPoint.y);
+      this.drawDot(midPoint.x, midPoint.y);
       this.lastPoint = { x: midPoint.x, y: midPoint.y };
     } while (number < this.maxNumberOfPointsGenerated);
-  }
-
-  selectOneOfFirstPointsRandomly() {
-    // Randomly select number from 0 to 2
-    // https://stackoverflow.com/a/7228322
-    const selectedPointIndex = Math.floor(Math.random() * 3);
-    return this.rootTrianglePoints[selectedPointIndex];
   }
 
   findMidPoint(firstPoint, secondPoint) {
@@ -114,7 +107,14 @@ class SierpinskiTriangle {
     };
   }
 
-  drawPoint(x, y) {
+  selectOneOfFirstPointsRandomly() {
+    // Randomly select number from 0 to 2
+    // https://stackoverflow.com/a/7228322
+    const selectedPointIndex = Math.floor(Math.random() * 3);
+    return this.rootTrianglePoints[selectedPointIndex];
+  }
+
+  drawDot(x, y) {
     this.mainCanvas2DContext.fillRect(x, y, 1, 1);
   }
 }
