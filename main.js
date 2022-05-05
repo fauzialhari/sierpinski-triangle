@@ -6,6 +6,8 @@ class SierpinskiTriangle {
     .getContext("2d");
   rootTriangle = new Path2D();
   rootTrianglePoints = [];
+  lastPoint = null;
+  maxNumberOfPointsGenerated = 100;
   get canvasHeight() {
     return this.mainCanvas2DContext.canvas.height;
   }
@@ -19,7 +21,15 @@ class SierpinskiTriangle {
     this.mainCanvas2DContext.fillStyle = "#fff";
     this.initializeFirstThreeDots();
     this.mainCanvas.addEventListener("click", (event) => {
-      this.addPoint(event);
+      try {
+        if (!this.lastPoint) {
+          const { x, y } = this.addPoint(event);
+          this.lastPoint = { x, y };
+        }
+        this.generatePoint();
+      } catch (error) {
+        alert(error.message);
+      }
     });
   }
 
@@ -67,11 +77,41 @@ class SierpinskiTriangle {
   addPoint(event) {
     if (this.checkIsInRootTriangle(event.offsetX, event.offsetY)) {
       this.drawPoint(event.offsetX, event.offsetY);
+      return { x: event.offsetX, y: event.offsetY };
     }
+    throw new Error("The point is outside triangle");
   }
 
   checkIsInRootTriangle(x, y) {
     return this.mainCanvas2DContext.isPointInPath(this.rootTriangle, x, y);
+  }
+
+  generatePoint() {
+    let number = 1;
+    do {
+      number++;
+      const { x, y } = this.lastPoint;
+      const midPoint = this.findMidPoint(
+        this.selectOneOfFirstPointsRandomly(),
+        { x, y }
+      );
+      this.drawPoint(midPoint.x, midPoint.y);
+      this.lastPoint = { x: midPoint.x, y: midPoint.y };
+    } while (number < this.maxNumberOfPointsGenerated);
+  }
+
+  selectOneOfFirstPointsRandomly() {
+    // Randomly select number from 0 to 2
+    // https://stackoverflow.com/a/7228322
+    const selectedPointIndex = Math.floor(Math.random() * 3);
+    return this.rootTrianglePoints[selectedPointIndex];
+  }
+
+  findMidPoint(firstPoint, secondPoint) {
+    return {
+      x: (firstPoint.x + secondPoint.x) / 2,
+      y: (firstPoint.y + secondPoint.y) / 2,
+    };
   }
 
   drawPoint(x, y) {
